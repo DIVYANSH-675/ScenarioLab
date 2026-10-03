@@ -55,3 +55,16 @@ def audit(original, candidate, constraints):
             "scope": "Checks supplied constraints; does not establish causal validity or model prediction changes."}
 
 
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input", type=Path, help="JSON containing original, candidate, constraints")
+    parser.add_argument("--output", required=True, type=Path)
+    args = parser.parse_args()
+    data = json.loads(args.input.read_text())
+    report = audit(data["original"], data["candidate"], data.get("constraints", {}))
+    args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    return 0 if report["feasible"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
